@@ -43,6 +43,7 @@ function App() {
             }>
             </Route>
 
+
             {/* Stream Management */}
             <Route  path="/streams" element={
               <>
@@ -50,8 +51,8 @@ function App() {
                 <Menu_c />
               </>
               }>
-            
             </Route>
+
 
             {/* User Management */}
             <Route  path="/users" element={
@@ -61,6 +62,17 @@ function App() {
               </>
               }>
             </Route>
+
+
+            {/* Alert History */}
+            <Route  path="/alerts" element={
+              <>
+                <StreamAlerts_c />
+                <Menu_c />
+              </>
+              }> 
+            </Route> 
+
         </Routes>
 
       </Router>

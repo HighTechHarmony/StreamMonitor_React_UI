@@ -1,43 +1,9 @@
 import React, { useEffect, useState} from 'react';
+import { StreamReport_i, StreamConfigs_i, StreamImages_i, fetchStreamConfigs, fetchStreamImages, fetchStreamReports } from './StreamFunctions'; // Adjust the import path as necessary
 
 const console_debug_level = 2;
 
-// Interfaces
 
-
-
-// StreamConfigs_i objects have the config info for a single stream
-interface StreamConfigs_i {
-  title: string;
-  _id: string;
-  uri: string;
-  audio: string;
-  enabled: string;
-}
-
-// Stream image has image data stored as base64 encoded string, along with some basic metadata
-interface StreamImage_i {
-  _id: string;
-  title: string;
-  data: string;
-  timestamp: string;
-}
-
-// StreamImages_i objects are dictionaries of StreamImage_i objects, with the key being
-// the stream title.  This is largely required because of the way the data is returned from the server
-// (It would be preferable to have an array of StreamImage_i objects, but that's not how it's returned)
-interface StreamImages_i {
-  [key: string]: StreamImage_i;
-}
-
-// A StreamReport consists of all of the up-to-date information about a stream.
-interface StreamReport_i {
-  _id: string;
-  title: string;
-  status: string;
-  image_bin: string;
-  image_timestamp?: string;
-}
 
 
 /* StreamReport component */
@@ -50,54 +16,7 @@ const StreamReport_c: React.FC = () => {
   const [loadingStreamImages, setLoadingStreamImages] = useState(true);
 
   useEffect(() => {
-    // Function to fetch stream configurations
-    const fetchStreamConfigs = async (): Promise<StreamConfigs_i[]> => {
-      try {
-        const response = await fetch('/api/stream_configs');
-        const configs: StreamConfigs_i[] = await response.json();
-        setStreamConfigs(configs);
-        setLoadingStreamConfigs(false);
-        console.log("Got the stream configs: ", configs);
-        return configs;
-      } catch (error) {
-        console.error('Error fetching stream configs', error);
-        throw error;
-      }
-    };
-
-    // Function to fetch stream images
-    const fetchStreamImages = async (enabledStreams: StreamConfigs_i[]): Promise<StreamImages_i> => {
-      try {
-        const response = await fetch('/api/stream_images', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ stream_titles: enabledStreams.map(stream => stream.title) })
-        });
-        const images: StreamImages_i = await response.json();
-        console.log("Got the images: ", images);
-        return images;
-      } catch (error) {
-        console.error('Error fetching stream images', error);
-        throw error;
-      }
-    };
-
-    // Function to fetch stream reports
-    const fetchStreamReports = async (enabledStreams: StreamConfigs_i[]): Promise<StreamReport_i[]> => {
-      try {
-        const response = await fetch('/api/stream_reports', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ stream_titles: enabledStreams.map(stream => stream.title) })
-        });
-        const reports: StreamReport_i[] = await response.json();
-        console.log("Got the stream reports: ", reports);
-        return reports;
-      } catch (error) {
-        console.error('Error fetching stream reports', error);
-        throw error;
-      }
-    };
+    
 
     // Function to process reports and images
     // Basically this decodes and inserts the images into the reports
@@ -121,11 +40,19 @@ const StreamReport_c: React.FC = () => {
         // First determine the enabled streams
         const configs = await fetchStreamConfigs();
         const enabledStreams = configs.filter((config: StreamConfigs_i) => config.enabled === "1");
+        setStreamConfigs(configs);
+        setLoadingStreamConfigs(false);
 
         // Fetch reports for these streams
         const reports = await fetchStreamReports(enabledStreams);
+        setStreamReports(reports);
+        setLoadingStreamReports(false);
+        
+
         // Fetch images for these streams
         const images = await fetchStreamImages(enabledStreams);
+        setLoadingStreamImages(false);
+
 
         // Call the processor to combine the reports and images
         const processedReports = processReportsAndImages(reports, images);
