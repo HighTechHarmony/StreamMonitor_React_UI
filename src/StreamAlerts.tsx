@@ -14,7 +14,7 @@ const StreamAlerts_c: React.FC = () => {
 
     useEffect(() => {
         const fetchStreamAlerts = async () => {
-            const body_to_send = JSON.stringify({ stream_titles: streamIds.map(stream => stream.title), limit: 10 });
+            // const body_to_send = JSON.stringify({ stream_titles: streamIds.map(stream => stream.title), limit: 10 });
            
         };
 
