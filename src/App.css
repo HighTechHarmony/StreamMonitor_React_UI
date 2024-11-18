@@ -1,0 +1,15 @@
+/* Tables within div with id UserManager gets 10 cell padding */
+#UserManager td {
+  padding: 10px;
+  border: 1px solid black;
+}
+
+#StreamReport td {
+  padding: 10px;
+  border: 1px solid black;
+}
+
+#StreamManager td {
+  padding: 10px;
+  border: 1px solid black;
+}
