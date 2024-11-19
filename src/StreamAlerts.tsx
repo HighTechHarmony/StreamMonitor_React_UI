@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import StreamReport_c from './StreamReport';
+import DOMPurify from 'dompurify';
 import { StreamConfigs_i, fetchStreamConfigs } from './StreamFunctions'; // Adjust the import path as necessary
 
 interface StreamAlerts_i {
     timestamp: string;
     stream: string;
     alert: string;
-    image: string;
+    image: string;    
 }
+
+// Adjust this for the desired number of alerts to be displayed
+const limit: number = 10; 
 
 
 const StreamAlerts_c: React.FC = () => {
@@ -18,15 +21,13 @@ const StreamAlerts_c: React.FC = () => {
 
         const fetchStreamAlerts = async (limit:number) => {
 
-
-            // Determine enabled streams
             try {
                 // First determine the enabled streams
                 const configs = await fetchStreamConfigs();
                 const enabledStreams = configs.filter((config: StreamConfigs_i) => config.enabled === "1");
 
                 
-                // The fetch stream alerts API call body needs an array of desired stream_titles, and a num_alerts integer (AKA limit)
+                // The fetch stream alerts API call body needs an array of desired stream_titles, and a num_alerts integer (AKA the limit)
                 const body_to_send:string = JSON.stringify({ stream_titles: enabledStreams.map(stream => stream.title), num_alerts: limit });
 
                 const response = await fetch('/api/stream_alerts', {
@@ -37,31 +38,27 @@ const StreamAlerts_c: React.FC = () => {
                 let alerts: StreamAlerts_i[] = await response.json();
                 console.log("Got the stream alerts: ", alerts);
 
-                // Convert each image from base64 to binary
+                // Do some massaging of the alert content
                 alerts.forEach((alert) => {
                     if (alert.image) {
                         alert.image = atob(alert.image);
                     }
+
+                    // Make links clickable
+                    alert.alert = alert.alert.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
                 });
 
 
                 setStreamAlerts(alerts);
                 setLoading(false);
-                
 
             }
             catch (error) {
                 console.error('Error fetching stream alerts', error);
             };
-
-
         
         };  // End of fetchStreamAlerts function
 
-
-        
-
-        
 
         fetchStreamAlerts(10);
         
@@ -71,33 +68,28 @@ const StreamAlerts_c: React.FC = () => {
         return <div>Loading...</div>;
     }
 
-    return (
-        <div id="StreamAlerts">
-            <h2>Stream Alerts</h2>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Stream</th>
-                        <th>Alert</th>
-                        <th>Image</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {streamAlerts.map((streamAlert: StreamAlerts_i) => (
-                        <tr key={streamAlert.timestamp}>
-                            <td>{streamAlert.timestamp}</td>
-                            <td>{streamAlert.stream}</td>
-                            <td>{streamAlert.alert}</td>
-                            <td>
-                            {streamAlert.image ? <img src={`data:jpeg;base64,${streamAlert.image}`} alt={streamAlert.alert} height="200" /> : <div>No Image</div>}
+    let alert_row: number = 1;  // Initialize the alert row counter
 
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+    return (
+        
+        <div id="StreamAlerts">
+            <h2> Last {limit} Stream Alerts:</h2>
+            
+                {streamAlerts.map((streamAlert: StreamAlerts_i) => (
+                    <div className="stream-row" key={streamAlert.timestamp}>
+                        <div className="stream-image">                            
+                            <span className="stream-alert-number">{alert_row++}</span>
+                            {streamAlert.image ? <img src={`data:jpeg;base64,${streamAlert.image}`} alt={streamAlert.alert} height="200" /> : <div>No Image</div>}
+                        </div>
+
+                        <div className="stream-info">                            
+                            <span className="timestamp">{streamAlert.timestamp}</span>
+                            <span className="stream-name">{streamAlert.stream}</span>                            
+                            <span className="alert-info" dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(streamAlert.alert)}}></span>
+                        </div>
+                    </div>
+                ))}
+
         </div>
     );
 }

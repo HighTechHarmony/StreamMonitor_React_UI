@@ -1,3 +1,67 @@
+
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+  /* Allow space on the left for the sidebar */
+  margin-left: 180px;
+
+}
+
+
+/* Header Styling  - make it be above the container div*/
+.header {
+  position: absolute;
+  top: 0;
+  left: 50;
+  width: 100%;
+  background: #2c3e50;
+  color: #ecf0f1;
+  padding: 10px;
+  text-align: center;
+  height: 50px;
+  z-index: 10; /* Ensures the header is above the container */
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  /* background: #ecf0f1; */
+  position: relative;
+  margin-top: 50px;
+  z-index: 1; /* Ensures the content is above the sidebar */
+}
+
+.sidebar {
+  width: 180px;
+  background: #2c3e50;
+  color: #ecf0f1;
+  height: 100vh;
+  transition: width 0.3s;
+  /* Make sure this is fixed to the left */
+  position: fixed;
+  left: 0;
+  top: 0;
+
+}
+
+/* Collapsible sidebar */
+.sidebar.collapsed {
+  width: 50px;
+}
+
+.sidebar.collapsed .menu {
+  display: none;
+}
+
+
 /* Tables within div with id UserManager gets 10 cell padding */
 #UserManager td {
   padding: 10px;
@@ -13,3 +77,75 @@
   padding: 10px;
   border: 1px solid black;
 }
+
+/* StreamAlerts styling */
+
+.stream-alert-number{
+  padding: 10px;
+  font-size: 30px;
+}
+
+.stream-row {
+  display: flex;
+  align-items: center; /* Ensures items are centered vertically */
+  padding: 10px;
+  border-bottom: 1px solid #ccc; /* Adds a line between rows */
+}
+
+.stream-info {
+  flex: 1; /* Takes up remaining space */
+  display: flex;
+  flex-direction: column; /* Aligns text vertically */
+  justify-content: center; /* Centers text vertically */
+  font-size: 25px;
+}
+
+.stream-info span {
+  margin-bottom: 5px; /* Adds space between text lines */
+}
+
+.stream-image img {
+  height: 200px; /* Fixes the height of the image */  
+  width: 450px;  /* Ensure this is padded so the width is fixed to 500px */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
+  margin-left: 10px; /* Adds space between text and image */
+  /* Add 40% space to right of image*/
+  padding-right: 40px;
+}
+
+
+
+/* Menu Styling */
+
+
+
+
+.menu-button {
+  background: #34495e;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  padding: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #34495e;
+}
+
+.menu-item a {
+  text-decoration: none;
+  color: #ecf0f1;
+  padding: 15px; /* Apply padding to the link */
+}
+
+.menu-item:hover {
+  background: #1abc9c;
+}
+
