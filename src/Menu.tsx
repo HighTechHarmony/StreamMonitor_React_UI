@@ -32,6 +32,7 @@ const Menu_c: React.FC = () => {
                 <li className="menu-item"><a href="/streams">Modify Streams</a></li>
                 <li className="menu-item"><a href="/users">Modify Users</a></li>
                 <li className="menu-item"><a href="/alerts">Alert History</a></li>
+                <li className="menu-item"><a href="/settings">System Settings</a></li>
                 <li className="menu-item"><a href="/logout">Logout</a></li>
                 </ul>
             </div>

@@ -3,6 +3,7 @@ import StreamReport_c from './StreamReport';
 import UserManagement_c from './UserManager';
 import Menu_c from './Menu';
 import StreamAlerts_c from './StreamAlerts';
+import GlobalSettings_c from './GlobalSettings';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -62,6 +63,18 @@ function App() {
                   </>
                   }> 
                 </Route> 
+
+
+                {/* Global Settings */}
+                <Route path="/settings" element={
+                  <>
+                    <GlobalSettings_c />
+                    <Menu_c />
+                  </>
+                  }>
+                </Route>
+
+
             </Routes>
           </Router>
         {/* The end of the content div */}
