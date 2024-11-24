@@ -4,6 +4,7 @@ import UserManagement_c from './UserManager';
 import Menu_c from './Menu';
 import StreamAlerts_c from './StreamAlerts';
 import GlobalSettings_c from './GlobalSettings';
+import StreamManager_c from './StreamManager';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -38,7 +39,7 @@ function App() {
                 {/* Stream Management */}
                 <Route  path="/streams" element={
                   <>
-                    <StreamReport_c />
+                    <StreamManager_c />
                     <Menu_c />
                   </>
                   }>

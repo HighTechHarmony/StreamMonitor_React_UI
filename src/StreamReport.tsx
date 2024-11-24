@@ -36,6 +36,7 @@ const StreamReport_c: React.FC = () => {
     // Main function to fetch and process all data in a synchronous manner
     // Using await for step because external data retrieval occurs
     const fetchAndProcessData = async () => {
+      setLoadingStreamImages(true);
       try {
         // First determine the enabled streams
         const configs = await fetchStreamConfigs();
@@ -67,6 +68,14 @@ const StreamReport_c: React.FC = () => {
     };
 
     fetchAndProcessData();
+
+    // Set up an interval to fetch and process data every 5 seconds
+    const interval = setInterval(() => {
+      fetchAndProcessData();
+    }, 5000);
+
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(interval);
 
   }, []);  // End of useEffect for StreamReport component
 
