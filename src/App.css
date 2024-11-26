@@ -18,6 +18,7 @@ body, html {
 
 /* Header Styling  - make it be above the container div*/
 .header {
+  flex: 1;
   position: absolute;
   top: 0;
   left: 50;
@@ -28,18 +29,25 @@ body, html {
   text-align: center;
   height: 50px;
   z-index: 10; /* Ensures the header is above the container */
+  
+  display: flex;
+  align-items: center;
+
 }
 
 .content {
   flex: 1;
-  padding: 20px;
+  padding-top: 75px;
+  padding-left: 10px;   
   /* background: #ecf0f1; */
-  position: relative;
-  margin-top: 50px;
+  position: relative;  
   z-index: 1; /* Ensures the content is above the sidebar */
+  box-sizing: border-box;
+  transition: margin-left 0.3s ease;
 }
 
 .sidebar {
+  flex: 0 0 180px;
   width: 180px;
   background: #2c3e50;
   color: #ecf0f1;
@@ -49,6 +57,8 @@ body, html {
   position: fixed;
   left: 0;
   top: 0;
+
+  
 
 }
 
@@ -60,6 +70,18 @@ body, html {
 .sidebar.collapsed .menu {
   display: none;
 }
+
+/* Header adjustment when sidebar is collapsed */
+.container.collapsed .header {
+  left: 50px;
+  padding-left: 50px;
+}
+
+/* Content adjustment when sidebar is collapsed */
+.container.collapsed .content {
+  margin-left: -75px;
+}
+
 
 
 /* Tables within div with id UserManager gets 10 cell padding */
