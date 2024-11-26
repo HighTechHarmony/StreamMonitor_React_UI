@@ -68,11 +68,66 @@ body, html {
   border: 1px solid black;
 }
 
+/************************** Stream Report styling */
+
+#StreamReportTable {
+  width: 100%;
+  border-collapse: collapse;
+
+}
+
 #StreamReport td {
   padding: 10px;
   border: 1px solid black;
 }
 
+#StreamReportImageTD {
+  width: 20%;
+}
+
+#StreamReportTitleTD {
+  width: 20%;
+}
+
+#StreamReportIDTD {
+  width: 20%;
+}
+
+#StreamReportStatusTD {
+  width: 10%;
+}
+
+
+.StreamImageThumbDiv {
+  
+  height: 200px;
+  max-width: 400px;
+  width: auto;
+  overflow: hidden;
+}
+/* 
+.StreamReportThumbDiv img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+} */
+
+#StreamThumb {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.streamReportStatusDiv {
+  /* Text should wrap in this div */
+  white-space: normal;
+  word-wrap: break-word;
+  width: 250px;
+
+
+}
 
 /************************** Stream manager styling */
 
@@ -91,9 +146,9 @@ body, html {
 #StreamManagerTitleTD {
   width: 15%;
 }
-#StreamManagerStreamTypeTD {
-  width: 15%;
-}
+/* #StreamManagerStreamTypeTD {
+  width: 10%;
+} */
 
 #StreamManagerStreamTitleTD {
   width: 15%;  
@@ -104,7 +159,7 @@ body, html {
 }
 
 #StreamManagerTypeTD {
-  width: 15%;
+  width: 8%;
 
 }
 
@@ -139,7 +194,40 @@ body, html {
   align-items: center;
 }
 
+#EnabledSelector {
+  padding: 10px;
+}
 
+#StreamEnabledSelect {
+  /* Everything in this div is Vertically centered */
+  display: flex;
+  align-items: center;
+}
+
+
+/********************************** This is a slide switch for enabled checkbox */
+/* The switch - the box around the slider */
+.EnabledSwitch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.EnabledSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Label for the enable switch */
+.EnabledSwitch label {
+  position: relative;
+  left: 10px;
+  padding: 10px;
+
+}
 
 /********************************** This is a slide switch for AudioVideo checkbox */
 /* The switch - the box around the slider */

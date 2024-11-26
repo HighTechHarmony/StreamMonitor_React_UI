@@ -49,7 +49,7 @@ interface StreamConfigs_i {
     }
   };
 
-  // Function to fetch stream images
+  // Function to fetch all the stream images given a list of enabled streams
   const fetchStreamImages = async (enabledStreams: StreamConfigs_i[]): Promise<StreamImages_i> => {
     try {
       const response = await fetch('/api/stream_images', {
@@ -65,6 +65,26 @@ interface StreamConfigs_i {
       throw error;
     }
   };
+
+ /* Fetch a single stream image for a given stream title */
+const fetchStreamImage = async (streamTitle: string): Promise<StreamImage_i> => {
+  try {
+    const response = await fetch('/api/stream_images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stream_titles: [streamTitle] }) // Send an array with a single stream title
+    });
+    const images: StreamImages_i = await response.json();
+    console.log("Got the images: ", images);
+
+    // Decode and return the image 
+    return images[streamTitle]; 
+  } catch (error) {
+    console.error('Error fetching stream image for ' + streamTitle, error);
+    throw error;
+  }
+};
+
 
   // Function to fetch stream reports
   const fetchStreamReports = async (enabledStreams: StreamConfigs_i[]): Promise<StreamReport_i[]> => {
@@ -83,5 +103,5 @@ interface StreamConfigs_i {
     }
   };
 
-export { fetchStreamConfigs, fetchStreamImages, fetchStreamReports}
+export { fetchStreamConfigs, fetchStreamImages, fetchStreamImage, fetchStreamReports}
 export type {StreamConfigs_i, StreamImages_i, StreamImage_i, StreamReport_i };

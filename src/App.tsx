@@ -1,5 +1,6 @@
 import './App.css';
 import StreamReport_c from './StreamReport';
+import StreamReportImage_c from './StreamReport';
 import UserManagement_c from './UserManager';
 import Menu_c from './Menu';
 import StreamAlerts_c from './StreamAlerts';
@@ -28,8 +29,8 @@ function App() {
                 {/* Dashboard */}
                 <Route path="/" element={
                   <>
-                  <StreamReport_c />
-                  <UserManagement_c />
+                  <StreamReportImage_c />
+                  {/* <StreamReport_c />                   */}
                   <Menu_c />
                   </>
                   }>
