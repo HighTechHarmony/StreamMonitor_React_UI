@@ -2,6 +2,8 @@ import React, { useEffect, useState} from 'react';
 import { StreamReport_i, StreamConfigs_i, StreamImages_i, fetchStreamConfigs, fetchStreamImages, fetchStreamReports } from './StreamFunctions'; 
 // import { Stream } from 'stream';
 import StreamImage_c from "./StreamImage"
+import StreamReportStatus_c from "./StreamReportStatus"
+
 const console_debug_level = 2;
 
 
@@ -35,7 +37,7 @@ const StreamReport_c: React.FC = () => {
     };
 
     // Main function to fetch and process all data in a synchronous manner
-    // Using await for step because external data retrieval occurs
+    // Using await for each step because external data retrieval occurs
     const fetchAndProcessData = async () => {
       setLoadingStreamImages(true);
       try {
@@ -70,13 +72,6 @@ const StreamReport_c: React.FC = () => {
 
     fetchAndProcessData();
 
-    // Set up an interval to fetch and process data every 5 seconds
-    // const interval = setInterval(() => {
-    //   fetchAndProcessData();
-    // }, 5000);
-
-    // // Clear the interval when the component is unmounted
-    // return () => clearInterval(interval);
 
   }, []);  // End of useEffect for StreamReport component
 
@@ -114,7 +109,10 @@ const StreamReport_c: React.FC = () => {
                   </td>
                   {/* <td id="streamReportIDTD">{streamReport._id}</td> */}
                   <td id="streamReportTitleTD">{streamReport.title}</td>
-                  <td id="streamReportStatusTD"><div className="streamReportStatusDiv">{streamReport.status}</div></td>
+                  <td id="streamReportStatusTD"><div className="streamReportStatusDiv">
+                    {/* {streamReport.status} */}
+                    <StreamReportStatus_c streamTitle={streamReport.title} />
+                    </div></td>
                 </tr>
               ))
             }
