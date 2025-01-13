@@ -1,5 +1,6 @@
 import React, { useEffect, useState} from 'react';
 import { StreamConfigs_i, fetchStreamConfigs, } from './StreamFunctions'; // Adjust the import path as necessary
+import { useNavigate } from 'react-router-dom';
 
 // This component allows the user to review, add and delete streams, and edit stream configurations
 
@@ -8,6 +9,7 @@ import { StreamConfigs_i, fetchStreamConfigs, } from './StreamFunctions'; // Adj
 const StreamManager_c: React.FC = () => {
   const [streamConfigs_s, setStreamConfigs] = useState<StreamConfigs_i[]>([]);    // Stateful stream configs array
   const [loadingStreamConfigs, setLoadingStreamConfigs] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     
@@ -167,24 +169,25 @@ const StreamManager_c: React.FC = () => {
 
         {/* Button to apply any changes */}
         <button onClick={async () => {
-          try {
-            const response = await fetch('/api/update_stream_configs', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(streamConfigs_s)
-            });
+        try {
+          const response = await fetch('/api/update_stream_configs', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(streamConfigs_s)
+          });
 
-            if (response.ok) {
-              console.log("Stream configs updated successfully");
-            } else {
-              console.error("Failed to update stream configs");
-            }
-          } catch (error) {
-              console.error('Error updating stream configs', error);
+          if (response.ok) {
+            console.log("Stream configs updated successfully");
+            navigate('/'); // Navigate to the dashboard view
+          } else {
+            console.error("Failed to update stream configs");
           }
-        }}>Apply Changes</button>
+        } catch (error) {
+          console.error('Error updating stream configs', error);
+        }
+      }}>Apply Changes</button>
 
 
 

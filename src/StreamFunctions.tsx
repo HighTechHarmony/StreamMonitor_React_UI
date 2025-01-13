@@ -39,7 +39,10 @@ interface StreamConfigs_i {
   // Function to fetch stream configurations
   const fetchStreamConfigs = async (): Promise<StreamConfigs_i[]> => {
     try {
-      const response = await fetch('/api/stream_configs');
+      const response = await fetch('/api/stream_configs', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
       const configs: StreamConfigs_i[] = await response.json();      
       console.log("Got the stream configs: ", configs);
       return configs;
