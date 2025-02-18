@@ -32,7 +32,8 @@ import React, { useState, useEffect } from 'react';
                     // Fetch the users
                     const response = await fetch('/api/users');
                     // Parse the response as JSON
-                    let users: User[] = await response.json();
+                    let data = await response.json();
+                    let users: User[] = Array.isArray(data) ? data : [];
                     // Set the users state variable
                     setUsers(users);
                     // Set the loading state variable to false
