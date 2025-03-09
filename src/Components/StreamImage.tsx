@@ -1,5 +1,7 @@
 import React, {useState, useEffect } from 'react';
 import { StreamReport_i, StreamImages_i, StreamImage_i, StreamConfigs_i, fetchStreamConfigs, fetchStreamReports, fetchStreamImages, fetchStreamImage } from './StreamFunctions';
+import { FaImage } from 'react-icons/fa';
+
 
 
 // A react component to display a single stream report image for given stream report
@@ -39,8 +41,8 @@ const StreamImage_c: React.FC<StreamImageProps> = ({ streamTitle }) => {
                 //   setLoadingStreamReports(false);
                 setLoadingStreamImages(false);
             } catch (error) {
-                console.error('Error fetching and processing data', error);
-            }
+                console.error('Error fetching and processing data', error);                
+            }   
         };
 
         fetchAndProcessData();
@@ -54,23 +56,27 @@ const StreamImage_c: React.FC<StreamImageProps> = ({ streamTitle }) => {
     , []);  // useEffect
 
 
+    // Example function to handle image loading error
+  const handleImageError = () => {
     
+    setStreamImage({ _id: '', title: '', timestamp: '', data: '' });
+  };
 
 
 
 
-    return (
-            <div>
-                {/* <h2>{streamReport.title}</h2> */}
-
-                {/* Ensure the image scales if overflow, not clip */}
-                {streamImage_s?.data && (
-                    // <img src={`data:jpeg;base64,${atob(streamImage_s.data)}`} alt={streamTitle} style={{ maxWidth: '100%', height: 'auto' }} />
-                    <img id="StreamThumb" src={`data:jpeg;base64,${atob(streamImage_s.data)}`} alt={streamTitle} />
-                )}
-                {/* <img id="StreamThumb" src={`data:jpeg;base64,${streamReport.image_bin}`} alt={streamReport.title}  /> */}
-            </div>
-        );
+  return (
+    <div className="stream-image">
+      {streamImage_s && streamImage_s.data ? (
+        <img src={`data:image/png;base64,${streamImage_s.data}`} alt="Stream" onError={handleImageError} />
+      ) : (
+        <div>
+          <FaImage size={40} />
+          <p>Image not available</p>
+        </div>
+      )}
+    </div>
+  );
 };  // StreamImage component
 
 

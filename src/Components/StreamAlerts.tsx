@@ -30,7 +30,7 @@ const StreamAlerts_c: React.FC = () => {
                 // The fetch stream alerts API call body needs an array of desired stream_titles, and a num_alerts integer (AKA the limit)
                 const body_to_send:string = JSON.stringify({ stream_titles: enabledStreams.map(stream => stream.title), num_alerts: limit });
 
-                const response = await fetch('/api/stream_alerts', {
+                const response = await fetch('/protected/api/stream_alerts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: body_to_send

@@ -5,10 +5,18 @@ import { useNavigate } from 'react-router-dom';
 // This component allows the user to review, add and delete streams, and edit stream configurations
 
 
+
+
 /* StreamManager component */
 const StreamManager_c: React.FC = () => {
   const [streamConfigs_s, setStreamConfigs] = useState<StreamConfigs_i[]>([]);    // Stateful stream configs array
   const [loadingStreamConfigs, setLoadingStreamConfigs] = useState(true);
+  const [streamsToDelete, setStreamsToDelete] = useState<string[]>([]);
+  const [newStreamRowAdded, setNewStreamRowAdded] = useState<boolean>(false);  
+  const [tempStreamTitle, setTempStreamTitle] = useState<string>('');
+  
+  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,8 +47,99 @@ const StreamManager_c: React.FC = () => {
   }, []);  // End of useEffect
 
 
+  if (loadingStreamConfigs) {
+    return <p>Loading stream configs...</p>;
+  }
+
+  // Check to see that streamConfigs_s is populated and valid
+  if (!streamConfigs_s) {
+    return <p>Stream configs not found</p>;
+  }
 
 
+
+
+  // Removes the row from the UI and adds the stream ID to the streamsToDelete state variable
+  const handleDeleteStream = async (streamId: string) => {   
+ 
+    let newConfigs = streamConfigs_s.filter((c) => c.streamId !== streamId);
+    setStreamConfigs(newConfigs);
+
+    // If the stream ID contains something valid, add it to the streamsToDelete state variable
+    if (streamId) {
+      setStreamsToDelete([...streamsToDelete, streamId]);
+    }
+
+  }
+
+  const handleAddNewStream = () => {
+    // console.log("handleAddNewStream called");
+    if (newStreamRowAdded === true) {
+      // console.log("New stream row already added");
+      return;
+    }
+
+    setStreamConfigs([...streamConfigs_s, {
+      _id: '',
+      title: '',
+      uri: '',
+      audio: '0',
+      enabled: '1',
+      streamId: Date.now().toString(), // Generate a unique ID for the new stream
+    }]);
+
+    setNewStreamRowAdded(true);
+  }
+
+  const handleTitleChange = (index: number, title: string) => {
+    let newConfigs = streamConfigs_s.map((c, i) => {
+      if (i === index) {
+        return { ...c, title };
+      }
+      return c;
+    });
+    setStreamConfigs(newConfigs);
+  }
+
+  const saveStreamConfigs = async () => {
+    try {
+      const response = await fetch('/protected/api/update_stream_configs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(streamConfigs_s)
+      });
+
+      if (response.ok) {
+        console.log("Stream configs updated successfully");
+        alert("If any stream titles were changed, please initiate a restart under global settings!");
+
+        // Make a secondary API call to delete streams
+        await Promise.all(streamsToDelete.map(async (stream) => {
+          console.log(`Deleting stream ${stream}`);
+          const deleteResponse = await fetch('/protected/api/delete_stream', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ streamId: stream })
+          });
+          if (!deleteResponse.ok) {
+          alert(`Failed to delete stream ${stream}`);
+          }
+          console.log(`Deleted stream ${stream}`);
+      }));
+
+
+        navigate('/'); // Navigate to the dashboard view
+      } else {
+        console.error("Failed to update stream configs");        
+      }
+    } catch (error) {
+      console.error('Error updating stream configs', error);
+    }
+  }
 
 
   return (
@@ -58,23 +157,17 @@ const StreamManager_c: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {streamConfigs_s.map((config) => (
-              <tr key={config.title}>
-                <td id="StreamManagerTitleTD">
-                    {/* A textbox populated with the config.title */}
-                    {/* If the contents is changed, it replaces the value in the StreamConfigs state variable */}
-                    {/* <input id="StreamTitleInput" type="text" value={config.title} onChange={(e) => {
-                        let newConfigs = streamConfigs_s.map((c) => {
-                        if (c.title === config.title) {
-                            return { ...c, title: e.target.value };
-                        } else {
-                            return c;
-                        }
-                        });
-                        setStreamConfigs(newConfigs);
-                    }} /> */}
-                    {config.title}
-                </td>
+            {Array.isArray(streamConfigs_s) && streamConfigs_s.map((config) => (
+              <tr key={config.streamId}>
+                 <td id="StreamManagerTitleTD">
+                    <input
+                      id="StreamTitleInput"
+                      type="text"
+                      value={config.title}
+                      onChange={(e) => handleTitleChange(streamConfigs_s.indexOf(config), e.target.value)}
+                      placeholder="Enter title"
+                    />
+                  </td>
 
                 <td id="StreamManagerURITD">
                     {/* A textbox populated with the config.uri */}
@@ -138,56 +231,31 @@ const StreamManager_c: React.FC = () => {
                     <button onClick={async () => {
                         let newConfigs = streamConfigs_s.filter((c) => c.title !== config.title);
                         setStreamConfigs(newConfigs);
-                    }}>Delete</button>
 
+                        // Call the delete function
+                        handleDeleteStream(config.streamId);
+
+                    }}>Delete</button>
                     
                 </td>
                 </tr>
-
-                
-                
-                
-                
 
             ))}
             </tbody>
         </table>
 
         {/* Button to add a blank row for a new stream */}
-        <button onClick={() => {
-          setStreamConfigs([...streamConfigs_s, {
-            _id: '',
-            title: '',
-            uri: '',
-            audio: '0',
-            enabled: '1'
-          }]);
-        }}>Add Stream</button>
+        <div className="StreamManagerAddNewStreamButton">
+          <button onClick={handleAddNewStream}>Add Stream</button>
+        </div>
 
 
         <p></p>
 
         {/* Button to apply any changes */}
-        <button onClick={async () => {
-        try {
-          const response = await fetch('/api/update_stream_configs', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(streamConfigs_s)
-          });
-
-          if (response.ok) {
-            console.log("Stream configs updated successfully");
-            navigate('/'); // Navigate to the dashboard view
-          } else {
-            console.error("Failed to update stream configs");
-          }
-        } catch (error) {
-          console.error('Error updating stream configs', error);
-        }
-      }}>Apply Changes</button>
+        <div className="StreamManagerApplyChangesButton">
+          <button onClick={saveStreamConfigs}>Apply Changes</button>
+        </div>
 
 
 

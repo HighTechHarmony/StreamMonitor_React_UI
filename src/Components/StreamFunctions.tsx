@@ -1,13 +1,16 @@
+import { useAuth, AuthContextType } from '../AuthContext';
 
 // Interfaces required for Stream management and reports
 
 // StreamConfigs_i objects have the config info for a single stream
+// Titles are optional as they are being phased out in favor of streamId as a unique key
 interface StreamConfigs_i {
-    title: string;
+    title?: string;
     _id: string;
     uri: string;
     audio: string;
     enabled: string;
+    streamId: string;
   }
   
   // Stream image has image data stored as base64 encoded string, along with some basic metadata
@@ -16,6 +19,7 @@ interface StreamConfigs_i {
     title: string;
     data: string;
     timestamp: string;
+    streamId?: string;
   }
   
   // StreamImages_i objects are dictionaries of StreamImage_i objects, with the key being
@@ -32,19 +36,34 @@ interface StreamConfigs_i {
     status: string;
     image_bin: string;
     image_timestamp?: string;
+    streamId: string;
   }
 
 
 
   // Function to fetch stream configurations
   const fetchStreamConfigs = async (): Promise<StreamConfigs_i[]> => {
+    
     try {
-      const response = await fetch('/api/stream_configs', {
+      // const { token } = UseAuth() as AuthContextType;
+      
+      const response = await fetch('/protected/api/stream_configs', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${token}`
+        }
       });
-      const configs: StreamConfigs_i[] = await response.json();      
-      console.log("Got the stream configs: ", configs);
+      const configs: StreamConfigs_i[] = await response.json();
+      
+      // If returned 401, redirect to login page
+      // if (response.status === 401) {
+      //   console.log("Redirecting to login page");
+      //   window.location.href = '/login';
+      
+      // }
+
+      // console.log("Got the stream configs: ", configs);
       return configs;
     } catch (error) {
       console.error('Error fetching stream configs', error);
@@ -55,7 +74,7 @@ interface StreamConfigs_i {
   // Function to fetch all the stream images given a list of enabled streams
   const fetchStreamImages = async (enabledStreams: StreamConfigs_i[]): Promise<StreamImages_i> => {
     try {
-      const response = await fetch('/api/stream_images', {
+      const response = await fetch('/protected/api/stream_images', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stream_titles: enabledStreams.map(stream => stream.title) })
@@ -72,7 +91,7 @@ interface StreamConfigs_i {
  /* Fetch a single stream image for a given stream title */
 const fetchStreamImage = async (streamTitle: string): Promise<StreamImage_i> => {
   try {
-    const response = await fetch('/api/stream_images', {
+    const response = await fetch('/protected/api/stream_images', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ stream_titles: [streamTitle] }) // Send an array with a single stream title
@@ -92,7 +111,7 @@ const fetchStreamImage = async (streamTitle: string): Promise<StreamImage_i> => 
   // Function to fetch stream reports
   const fetchStreamReports = async (enabledStreams: StreamConfigs_i[]): Promise<StreamReport_i[]> => {
     try {
-      const response = await fetch('/api/stream_reports', {
+      const response = await fetch('/protected/api/stream_reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stream_titles: enabledStreams.map(stream => stream.title) })

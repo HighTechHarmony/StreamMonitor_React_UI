@@ -5,7 +5,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'http://localhost:3000',
+      target: 'http://localhost:5000', // Proxy requests to the backend on port 5000 of the same host
       changeOrigin: true,
       onProxyReq: (proxyReq, req, res) => {
         console.log('Proxying request:', req.url);

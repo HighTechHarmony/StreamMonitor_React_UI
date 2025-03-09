@@ -111,7 +111,7 @@ const StreamReport_c: React.FC = () => {
                   <td id="streamReportTitleTD">{streamReport.title}</td>
                   <td id="streamReportStatusTD"><div className="streamReportStatusDiv">
                     {/* {streamReport.status} */}
-                    <StreamReportStatus_c streamTitle={streamReport.title} />
+                    <StreamReportStatus_c streamId={streamReport.streamId} />
                     </div></td>
                 </tr>
               ))
