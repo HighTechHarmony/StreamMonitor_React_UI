@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-  
+import { useNavigate } from 'react-router-dom';
   
   // A user consists of a username, password, enabled status, pushover id, and pushover token
   interface User {
@@ -23,6 +23,8 @@ import React, { useState, useEffect } from 'react';
         const [newUserRow, setNewUserRow] = useState<boolean>(false);
         const [usersToDelete, setUsersToDelete] = useState<User[]>([]);
         const [loading, setLoading] = useState(true);
+
+        const navigate = useNavigate();
     
         // This useEffect hook is called when the component is mounted
         useEffect(() => {
@@ -139,41 +141,45 @@ import React, { useState, useEffect } from 'react';
                 return user;
               });
 
-            //   console.log("saveUsers(): modifiedUsers: ", modifiedUsers);
+                //   console.log("saveUsers(): modifiedUsers: ", modifiedUsers);
         
-              // Send a POST request to the backend with the modified users
+                // Send a POST request to the backend with the modified users
               const response = await fetch('/protected/api/update_users', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(modifiedUsers)
-              });
-              if (!response.ok) {
-                alert("Failed to update users");
-              }  
-              console.log(response);
-
-              // Make a secondary API call to delete users
-            await Promise.all(usersToDelete.map(async (user) => {
-                const deleteResponse = await fetch('/protected/api/delete_user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userId: user.userId })
                 });
-                if (!deleteResponse.ok) {
-                alert(`Failed to delete user ${user.username}`);
-                }
-                console.log(`Deleted user ${user.username}`);
-            }));
+                
+                if (!response.ok) {
+                alert("Failed to update users");
+                }  
+                console.log(response);
+
+                // Make a secondary API call to delete users
+                await Promise.all(usersToDelete.map(async (user) => {
+                    const deleteResponse = await fetch('/protected/api/delete_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: user.userId })
+                    });
+                    if (!deleteResponse.ok) {
+                        alert(`Failed to delete user ${user.username}`);
+                    }
+                    console.log(`Deleted user ${user.username}`);
+                }));
+
+            navigate('/'); // Navigate to the dashboard view
 
             } catch (error) {
               alert("Failed to update users");
               console.error('Error updating users', error);
             }
           };
+
 
         // Return the JSX for the UserManagement component
         return (

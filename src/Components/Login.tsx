@@ -23,7 +23,8 @@ const Login_c: React.FC = () => {
       , 2000);
       
     } catch (error) {
-      alert('Failed to log in');
+      // What was the response?
+      alert('Login failed');
     }
   };
 
