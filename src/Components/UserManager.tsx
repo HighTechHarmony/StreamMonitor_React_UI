@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom';
         const [newUserRow, setNewUserRow] = useState<boolean>(false);
         const [usersToDelete, setUsersToDelete] = useState<User[]>([]);
         const [loading, setLoading] = useState(true);
+        const [restartRequired, setRestartRequired] = useState<boolean>(false);
 
         const navigate = useNavigate();
     
@@ -129,6 +130,16 @@ import { useNavigate } from 'react-router-dom';
             setUsersToDelete([...usersToDelete, user]);
         };
 
+        const handlePushoverIdChange = (userId: string, value: string) => {
+            setUsers(Users_s.map(u => u.userId === userId ? { ...u, pushover_id: value } : u));
+            setRestartRequired(true);  // Changing the pushover ID requires a restart of the backend
+        };
+
+        const handlePushoverTokenChange = (userId: string, value: string) => {
+            setUsers(Users_s.map(u => u.userId === userId ? { ...u, pushover_token: value } : u));
+            setRestartRequired(true);  // Changing the pushover token requires a restart of the backend
+        };
+
         // This function saves the users on the backend from the state variable
         const saveUsers = async () => {
             try {
@@ -171,6 +182,24 @@ import { useNavigate } from 'react-router-dom';
                     }
                     console.log(`Deleted user ${user.username}`);
                 }));
+
+                // If restartRequired is true, update the restart_due field in global_configs
+                if (restartRequired) {
+                    console.log("User config changes require a restart of the system, initiating...");
+                    const updateResponse = await fetch('/protected/api/update_global_settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ restart_due: "1" })
+                    });
+
+                    if (!updateResponse.ok) {
+                    console.error("Failed to update global config");
+                    } else {
+                    console.log("Global config updated successfully");
+                    }
+                }
 
             navigate('/'); // Navigate to the dashboard view
 
@@ -221,12 +250,14 @@ import { useNavigate } from 'react-router-dom';
                                     <td id="pushover_idTD"><input type="text" value={user.pushover_id} onChange={(e) => {
                                         let newUser = { ...user };
                                         newUser.pushover_id = e.target.value;
-                                        setUsers(Users_s.map(u => u.userId === user.userId ? newUser : u));
+                                        // setUsers(Users_s.map(u => u.userId === user.userId ? newUser : u));
+                                        handlePushoverIdChange(user.userId, e.target.value);
                                     }} /></td>
                                     <td id="pushover_tokenTD"><input type="text" value={user.pushover_token} onChange={(e) => {
                                         let newUser = { ...user };
                                         newUser.pushover_token = e.target.value;
-                                        setUsers(Users_s.map(u => u._id === user._id ? newUser : u));
+                                        // setUsers(Users_s.map(u => u._id === user._id ? newUser : u));
+                                        handlePushoverTokenChange(user.userId, e.target.value);
                                     }} 
                                     />
                                     </td>

@@ -10,11 +10,10 @@ import { useNavigate } from 'react-router-dom';
 /* StreamManager component */
 const StreamManager_c: React.FC = () => {
   const [streamConfigs_s, setStreamConfigs] = useState<StreamConfigs_i[]>([]);    // Stateful stream configs array
+  const [restartRequired, setRestartRequired] = useState<boolean>(false);
   const [loadingStreamConfigs, setLoadingStreamConfigs] = useState(true);
   const [streamsToDelete, setStreamsToDelete] = useState<string[]>([]);
   const [newStreamRowAdded, setNewStreamRowAdded] = useState<boolean>(false);  
-  const [tempStreamTitle, setTempStreamTitle] = useState<string>('');
-  
   
 
   const navigate = useNavigate();
@@ -34,14 +33,6 @@ const StreamManager_c: React.FC = () => {
     };
 
     fetchAndProcessData();
-
-    // Set an interval to make sure this component stays up to date
-    // const interval = setInterval(() => {
-    //   fetchAndProcessData();
-    // }, 5000);
-
-    // Clear the interval when the component is unmounted
-    // return () => clearInterval(interval);
 
 
   }, []);  // End of useEffect
@@ -98,11 +89,14 @@ const StreamManager_c: React.FC = () => {
       }
       return c;
     });
+
+    setRestartRequired(true);
     setStreamConfigs(newConfigs);
   }
 
   const saveStreamConfigs = async () => {
-    try {
+    try {   
+    
       const response = await fetch('/protected/api/update_stream_configs', {
         method: 'POST',
         headers: {
@@ -113,7 +107,7 @@ const StreamManager_c: React.FC = () => {
 
       if (response.ok) {
         console.log("Stream configs updated successfully");
-        alert("If any stream titles were changed, please initiate a restart under global settings!");
+        // alert("If any stream titles were changed, please initiate a restart under global settings!");
 
         // Make a secondary API call to delete streams
         await Promise.all(streamsToDelete.map(async (stream) => {
@@ -130,6 +124,24 @@ const StreamManager_c: React.FC = () => {
           }
           console.log(`Deleted stream ${stream}`);
       }));
+
+      // If restartRequired is true, update the restart_due field in global_configs
+      if (restartRequired) {
+        console.log("Stream config changes require a restart of the system, initiating...");
+        const updateResponse = await fetch('/protected/api/update_global_settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ restart_due: "1" })
+        });
+
+        if (!updateResponse.ok) {
+          console.error("Failed to update global config");
+        } else {
+          console.log("Global config updated successfully");
+        }
+      }
 
 
         navigate('/'); // Navigate to the dashboard view

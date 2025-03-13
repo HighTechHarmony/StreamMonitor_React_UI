@@ -12,8 +12,7 @@ const console_debug_level = 2;
 /* StreamReport component */
 // A nice display of the latest info reported by the stream, as well as its latest screen image
 const StreamReport_c: React.FC = () => {
-  const [streamReports_s, setStreamReports] = useState<StreamReport_i[]>([]);    // Stateful stream reports array
-  const [streamConfigs_s, setStreamConfigs] = useState<StreamConfigs_i[]>([]);    // Stateful stream configs array
+  const [streamReports_s, setStreamReports] = useState<StreamReport_i[]>([]);    // Stateful stream reports array  
   const [loadingStreamReports, setLoadingStreamReports] = useState(true);
   const [loadingStreamConfigs, setLoadingStreamConfigs] = useState(true);
   const [loadingStreamImages, setLoadingStreamImages] = useState(true);
@@ -43,8 +42,7 @@ const StreamReport_c: React.FC = () => {
       try {
         // First determine the enabled streams
         const configs = await fetchStreamConfigs();
-        const enabledStreams = configs.filter((config: StreamConfigs_i) => config.enabled === "1");
-        setStreamConfigs(configs);
+        const enabledStreams = configs.filter((config: StreamConfigs_i) => config.enabled === "1");        
         setLoadingStreamConfigs(false);
 
         // Fetch reports for these streams
@@ -81,6 +79,29 @@ const StreamReport_c: React.FC = () => {
       return <div>Loading Stream Reports...</div>;
     }
 
+    const convertStatusMessage = (status: string) => {
+      // Creates a map containing regexes to match against the status message
+      // and the replacement message and color 
+      const statusMap = [
+        { regex: /ffmpeg error/im, message: "Error occurred: ", color: "red" },
+        { regex: /got frame/im, message: "OK: Analyzing stream", color: "green" },
+        { regex: /queue empty/im, message: "OK: Queue refilling", color: "green" },
+        { regex: /Running framegrab:/im, message: "OK: Updating thumbnail", color: "green" },
+        { regex: /request: GET/im, message: "OK: Requesting more data", color: "green" },
+        // Add more status mappings as needed
+      ];
+  
+      for (const { regex, message, color } of statusMap) {
+        if (regex.test(status)) {
+          return { message, color };
+        }
+      }
+  
+      // Default is the uninterpretted message and color is black
+      return { message: status, color: "black" };
+    };
+  
+
     return (
       <div id="StreamReport">
         <h2>Stream Reports</h2>
@@ -94,28 +115,27 @@ const StreamReport_c: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {
-              streamReports_s.map((streamReport) => (
+            {streamReports_s.map((streamReport) => {
+              const { message, color } = convertStatusMessage(streamReport.status);
+              return (
                 <tr key={streamReport._id}>
-                  
                   <td id="streamReportImageTD"> 
-                    
                     {/* {streamReport.image_bin ? <img src={`data:jpeg;base64,${streamReport.image_bin}`} alt={streamReport.title} height="200" /> : <div>No Image</div>} */}
                     {/* <div className="StreamImageThumbDiv"><StreamImage_c streamReport={streamReport} streamReportFunction={setStreamReports} /></div> */}
                     <div className="StreamImageThumbDiv"><StreamImage_c streamTitle={streamReport.title} /></div>
-                    
-                    
-                    
                   </td>
                   {/* <td id="streamReportIDTD">{streamReport._id}</td> */}
                   <td id="streamReportTitleTD">{streamReport.title}</td>
-                  <td id="streamReportStatusTD"><div className="streamReportStatusDiv">
-                    {/* {streamReport.status} */}
-                    <StreamReportStatus_c streamId={streamReport.streamId} />
-                    </div></td>
+                  <td id="streamReportStatusTD">
+                    <div className="streamReportStatusDiv" style={{color}}>
+                      {/* {streamReport.status} */}
+                      {message}
+                    </div>
+                  </td>
                 </tr>
-              ))
-            }
+              );
+            })}
+          
           </tbody>
         </table>
 
